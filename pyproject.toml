@@ -6,9 +6,16 @@ authors = ["KindMaple <angelattack9759@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+python-dotenv = "^0.19.1"
+notion-client = "^0.7.1"
+requests = "^2.26.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+flake8 = "^4.0.1"
+black = "^21.9b0"
+isort = "^5.9.3"
+icecream = "^2.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
