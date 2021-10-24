@@ -1,53 +1,40 @@
-import os
-from pathlib import Path
+import datetime
 from typing import Any, Dict, List
 
-import requests
-from dotenv import load_dotenv
 from icecream import ic
-
-API_BASE_URL = "https://api.notion.com/v1"
+from lib import fetch_daily_content, fetch_daily_meta_info, setup
 
 if __name__ == "__main__":
-    # .envファイルを読み込み、環境変数として扱う
-    dotenv_path: Path = Path().parent / ".env"
-    if dotenv_path.exists():
-        # .envがあるときはそっちを読み込む
-        load_dotenv(dotenv_path)
-    NOTION_TOKEN: str = os.environ.get("NOTION_TOKEN")
-    NOTION_DATABASE_ID: str = os.environ.get("NOTION_DATABASE_ID")
-    NOTION_VERSION: str = os.environ.get("NOTION_VERSION")
+    setup()
+    page_info: Dict[str, Any] = fetch_daily_meta_info(datetime.date(2021, 10, 23))
+    blocks: List[Dict[str, Any]] = fetch_daily_content(page_info["id"])
+    ic(blocks)
 
-    """ ページ一覧を取得する """
-    headers: Dict[str, str] = {
-        "Authorization": f"Bearer {NOTION_TOKEN}",
-        "Content-Type": "application/json",
-        "Notion-Version": NOTION_VERSION,
-    }
-    response: requests.Response = requests.post(
-        url=f"{API_BASE_URL}/databases/{NOTION_DATABASE_ID}/query",
-        headers=headers,
-    )
-    assert response.status_code == 200
-    pages: List[Dict[str, Any]] = response.json()["results"]
-    for page in pages:
-        ic(page["properties"]["名前"]["title"][0]["plain_text"])
-        ic(page["url"])
+    # import requests
+    # from pathlib import Path
+    # from dotenv import load_dotenv
+    # import os
+    # from typing import List
 
-    """ 特定のページの情報を取得する """
-    page_id: str = pages[2]["id"]
-    ic(page_id)
-    response = requests.get(
-        url=f"{API_BASE_URL}/pages/{page_id}",
-        headers=headers,
-    )
-    assert response.status_code == 200
-    ic(response.json())
+    # API_BASE_URL = "https://api.notion.com/v1"
+    # # .envファイルを読み込み、環境変数として扱う
+    # dotenv_path: Path = Path().parent / ".env"
+    # if dotenv_path.exists():
+    #     # .envがあるときはそっちを読み込む
+    #     load_dotenv(dotenv_path)
+    # """ 環境変数からトークンなどを取得 """
+    # NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
+    # NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
+    # NOTION_VERSION = os.environ.get("NOTION_VERSION")
 
-    """ ページの内容を取得する """
-    response = requests.get(
-        url=f"{API_BASE_URL}/blocks/{page_id}/children",
-        headers=headers,
-    )
-    assert response.status_code == 200
-    ic(response.json())
+    # headers = {
+    #     "Authorization": f"Bearer {NOTION_TOKEN}",
+    #     "Content-Type": "application/json",
+    #     "Notion-Version": NOTION_VERSION,
+    # }
+    # response: requests.Response = requests.get(
+    #     url=f"{API_BASE_URL}/blocks/{block_id}/children",
+    #     headers=headers,
+    # )
+    # blocks: List[Dict[str, Any]] = response.json()["results"]
+    # ic(blocks)

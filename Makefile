@@ -9,4 +9,4 @@ black:
 	python -m black ableef/ tests/
 
 test:
-	python -m pytest tests/
+	python -m pytest -v tests/
