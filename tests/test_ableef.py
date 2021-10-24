@@ -27,13 +27,13 @@ class Test_fetch_meta_info:
     def test_2021_10_23のBleeeeeefingページのメタ情報をDictで返す(self):
         today: datetime.date = datetime.date(2021, 10, 23)
         result: Dict[str, Any] = fetch_daily_meta_info(today)
-        assert result["properties"]["名前"]["title"][0]["plain_text"] == "2021-10-23"
+        assert result["properties"]["名前"]["title"][0]["plain_text"] == "2021/10/23"
         assert result["properties"]["日付"]["date"]["start"] == "2021-10-23"
 
     def test_2021_10_24のBleeeeeefingページのメタ情報をDictで返す(self):
         today: datetime.date = datetime.date(2021, 10, 24)
         result: Dict[str, Any] = fetch_daily_meta_info(today)
-        assert result["properties"]["名前"]["title"][0]["plain_text"] == "2021-10-24"
+        assert result["properties"]["名前"]["title"][0]["plain_text"] == "2021/10/24"
         assert result["properties"]["日付"]["date"]["start"] == "2021-10-24"
 
 

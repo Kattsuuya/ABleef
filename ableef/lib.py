@@ -114,5 +114,5 @@ def post_daily_bleeeeeefing() -> None:
     blocks: List[Dict[str, Any]] = fetch_daily_content(page_info["id"])
     message: str = to_slack_format(blocks)
     # 先頭に日付を付与する
-    message = f'{today.strftime("%Y-%m-%d")}\n{message}'
+    message = f'{today.strftime("%Y/%m/%d")}\n{message}'
     post_to_slack(message, SLACK_CHANNEL)
