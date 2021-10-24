@@ -11,7 +11,7 @@ from slack_sdk.errors import SlackApiError
 
 
 def setup():
-    global API_BASE_URL, NOTION_TOKEN, NOTION_DATABASE_ID, NOTION_VERSION, SLACK_TOKEN, headers, slack_client
+    global API_BASE_URL, NOTION_TOKEN, NOTION_DATABASE_ID, NOTION_VERSION, SLACK_TOKEN, SLACK_CHANNEL, headers, slack_client, today
     API_BASE_URL = "https://api.notion.com/v1"
     # .envファイルを読み込み、環境変数として扱う
     dotenv_path: Path = Path().parent / ".env"
@@ -23,6 +23,7 @@ def setup():
     NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
     NOTION_VERSION = os.environ.get("NOTION_VERSION")
     SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+    SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL")
 
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
@@ -30,6 +31,7 @@ def setup():
         "Notion-Version": NOTION_VERSION,
     }
     slack_client = WebClient(token=SLACK_TOKEN)
+    today = datetime.date.today()
 
 
 def fetch_daily_meta_info(date_: datetime.date) -> Dict[str, Any]:
@@ -104,3 +106,13 @@ def post_to_slack(message: str, channel: str) -> None:
         assert e.response["ok"] is False
         assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
         print(f"Got an error: {e.response['error']}")
+
+
+def post_daily_bleeeeeefing() -> None:
+    setup()
+    page_info: Dict[str, Any] = fetch_daily_meta_info(today)
+    blocks: List[Dict[str, Any]] = fetch_daily_content(page_info["id"])
+    message: str = to_slack_format(blocks)
+    # 先頭に日付を付与する
+    message = f'{today.strftime("%Y-%m-%d")}\n{message}'
+    post_to_slack(message, SLACK_CHANNEL)
