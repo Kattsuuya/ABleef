@@ -48,7 +48,10 @@ class Test_fetch_daily_content:
         block_id: str = "76659722-c2fc-4de4-ae72-92b4c2b306a9"
         result: List[Dict[str, Any]] = fetch_daily_content(block_id)
         assert result[1]["type"] == "bulleted_list_item"
-        assert result[1]["bulleted_list_item"]["text"][0]["plain_text"] == "テスト駆動開発の練習"
+        assert (
+            result[1]["bulleted_list_item"]["text"][0]["plain_text"]
+            == "Bleeeeeefing自動投稿スクリプトをテスト駆動開発+非公式ライブラリなしで書き直し（dailyの投稿部まで）"
+        )
 
 
 class Test_to_slack_format:
