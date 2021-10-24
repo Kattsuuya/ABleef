@@ -5,14 +5,22 @@ fetch_daily_meta_info()
     - [x] 2021-10-23のBleeeeeefingページのメタ情報をDictで返す
     - [x] 2021-10-24のBleeeeeefingページのメタ情報をDictで返す
 fetch_daily_content()
-- [ ] 1日分のBleeeeeefingページの内容をJSONで取得する
+- [x] 1日分のBleeeeeefingページの内容をJSONで取得する
     - [x] 2021-10-23のBleeeeeefingページのメタ情報をDictで返す
-    - [ ] 2021-10-24のBleeeeeefingページのメタ情報をDictで返す
+    - [x] 2021-10-24のBleeeeeefingページのメタ情報をDictで返す
+to_slack_format()
+- [x] 空のリストが渡されたら空文字列を返す
+- [x] Slackに投稿する文字列を返す
+    - [x] その他を本文そのまま連結して返す
+    - [x] heading_2をボールド体に変換する
+    - [x] bulleted_list_itemを"・"で始まる文字列に変換する
 """
 import datetime
 from typing import Any, Dict, List
 
-from ableef.lib import fetch_daily_content, fetch_daily_meta_info
+import pytest
+
+from ableef.lib import fetch_daily_content, fetch_daily_meta_info, to_slack_format
 
 
 class Test_fetch_meta_info:
@@ -41,3 +49,82 @@ class Test_fetch_daily_content:
         result: List[Dict[str, Any]] = fetch_daily_content(block_id)
         assert result[1]["type"] == "bulleted_list_item"
         assert result[1]["bulleted_list_item"]["text"][0]["plain_text"] == "テスト駆動開発の練習"
+
+
+class Test_to_slack_format:
+    def test_空のリストが渡されたら空文字列を返す(self):
+        result: str = to_slack_format([])
+        assert result == ""
+
+    def test_その他を本文そのまま連結して返す(self, mock_content):
+        result: str = to_slack_format(mock_content)
+        assert "Problems" in result
+        assert "hoge" in result
+
+    def test_heading_2をボールド体に変換する(self, mock_content):
+        result: str = to_slack_format(mock_content)
+        assert "*Problems*" in result
+
+    def test_bulleted_list_itemを中黒で始まる文字列に変換する(self, mock_content):
+        result: str = to_slack_format(mock_content)
+        assert "・hoge" in result
+
+
+@pytest.fixture(scope="session")
+def mock_content():
+    return [
+        {
+            "archived": False,
+            "created_time": "2021-10-23T12:36:00.000Z",
+            "has_children": False,
+            "heading_2": {
+                "text": [
+                    {
+                        "annotations": {
+                            "bold": False,
+                            "code": False,
+                            "color": "default",
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                        },
+                        "href": None,
+                        "plain_text": "Problems",
+                        "text": {"content": "Problems", "link": None},
+                        "type": "text",
+                    }
+                ]
+            },
+            "id": "4fcf10f2-08f4-4155-be1f-25d3b16b901a",
+            "last_edited_time": "2021-10-23T12:37:00.000Z",
+            "object": "block",
+            "type": "heading_2",
+        },
+        {
+            "archived": False,
+            "bulleted_list_item": {
+                "text": [
+                    {
+                        "annotations": {
+                            "bold": False,
+                            "code": False,
+                            "color": "default",
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                        },
+                        "href": None,
+                        "plain_text": "hoge",
+                        "text": {"content": "hoge", "link": None},
+                        "type": "text",
+                    }
+                ]
+            },
+            "created_time": "2021-10-23T12:37:00.000Z",
+            "has_children": False,
+            "id": "6f8c41b7-4bd5-495c-8e48-7e88bb5583d1",
+            "last_edited_time": "2021-10-23T12:37:00.000Z",
+            "object": "block",
+            "type": "bulleted_list_item",
+        },
+    ]

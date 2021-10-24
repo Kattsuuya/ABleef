@@ -2,13 +2,25 @@ import datetime
 from typing import Any, Dict, List
 
 from icecream import ic
-from lib import fetch_daily_content, fetch_daily_meta_info, setup
+from lib import (
+    fetch_daily_content,
+    fetch_daily_meta_info,
+    post_to_slack,
+    setup,
+    to_slack_format,
+)
 
 if __name__ == "__main__":
     setup()
-    page_info: Dict[str, Any] = fetch_daily_meta_info(datetime.date(2021, 10, 23))
+    today: datetime.date = datetime.date(2021, 10, 23)
+    page_info: Dict[str, Any] = fetch_daily_meta_info(today)
     blocks: List[Dict[str, Any]] = fetch_daily_content(page_info["id"])
-    ic(blocks)
+    message: str = to_slack_format(blocks)
+    # 先頭に日付を付与する
+    message = f'{today.strftime("%Y-%m-%d")}\n{message}'
+    # 個人DM
+    channel = "U01KZU17SKH"
+    post_to_slack(message, channel)
 
     # import requests
     # from pathlib import Path
